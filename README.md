@@ -28,21 +28,25 @@ Set the package version in the server, the server should return a json with the 
     }
 ```
 
-Ensure the main.dart is connected to the server in the functions
+Ensure the main.dart is connected for the next functions by changing the constants in `constants.dart` you can also modify the time after check for new updates
+
+```dart
+    const serverUrl = 'http://localhost:3001';
+    const timeAfterCheck = 1; // minutes
+```
 
 ```dart
     Future<bool> newBuildExist() async {
         //Call backend API to check if new build exist
         //Return true if new build exist
         //http request to localhost3001/version
-        final url = Uri.http('localhost:3001', 'version');
+        final response = await http.get(Uri.parse('$serverUrl/version'));
     ...
 ```
 
 ```dart
     Future<void> installBuildInTempPath() async {
-        final url = Uri.parse('http://localhost:3001/autoupdate.msix');
-        final response = await http.get(url);
+        final response = await http.get(Uri.parse('$serverUrl/autoupdate.msix'));
     ...
 ```
 

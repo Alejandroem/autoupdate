@@ -75,7 +75,7 @@ Future<void> executeNewBuildInstaller() async {
 }
 
 void scheduleVersionCheck() {
-  Future.delayed(const Duration(minutes: 1), () async {
+  Future.delayed(const Duration(minutes: timeAfterCheck), () async {
     if (await newBuildExist()) {
       await installBuildInTempPath();
       await executeNewBuildInstaller();
