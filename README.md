@@ -1,6 +1,6 @@
 # Autoupdate
 
-## Create MSI installer
+## Getting started
 
 Edit pubspec.yaml to set the right version 
 
