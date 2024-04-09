@@ -2,7 +2,7 @@ name: autoupdate
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 1.0.0+0
 
 msix_config:
   display_name: Flutter App
@@ -21,6 +21,7 @@ dependencies:
   http: ^1.1.0
   package_info_plus: ^4.2.0
   path_provider: ^2.0.2
+  process_run: ^0.14.2
 
 
 dev_dependencies:

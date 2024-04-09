@@ -5,63 +5,13 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
-
-bool autoUpdateTaskExist() {
-  try {
-    ProcessResult result = Process.runSync(
-      'powershell.exe',
-      [
-        '-ExecutionPolicy',
-        'Bypass',
-        '-File',
-        '.\\scripts\\check_scheduler_task.ps1',
-      ],
-    );
-    if (result.stdout.isNotEmpty) {
-      log(result.stdout);
-      if (result.stdout.contains('True')) {
-        return true;
-      }
-    }
-    if (result.stderr.isNotEmpty) {
-      log(result.stderr);
-    }
-  } catch (e) {
-    log("Error checking for the task: $e");
-  }
-  return false;
-}
-
-void installAutoUpdateTask() {
-  try {
-    ProcessResult result = Process.runSync(
-      'powershell.exe',
-      [
-        'Start-Process',
-        'powershell.exe',
-        '.\\scripts\\install_scheduler_task.ps1',
-        '-Verb',
-        'RunAs',
-        '-WindowStyle',
-        'Hidden',
-      ],
-    );
-    if (result.stdout.isNotEmpty) {
-      log(result.stdout);
-    }
-    if (result.stderr.isNotEmpty) {
-      log(result.stderr);
-    }
-  } catch (e) {
-    log("Error Installing the script: $e");
-  }
-}
+import 'package:process_run/process_run.dart';
 
 Future<bool> newBuildExist() async {
   //Call backend API to check if new build exist
   //Return true if new build exist
   //http request to localhost3001/version
-  final url = Uri.https('localhost:3001', 'version');
+  final url = Uri.http('localhost:3001', 'version');
   final response = await http.get(url);
   final decodedResponse = jsonDecode(response.body);
 
@@ -69,15 +19,15 @@ Future<bool> newBuildExist() async {
   final version = packageInfo.version;
 
   if (response.statusCode == 200) {
-    List<String> versionList = version.split('.');
+    List<int> versionList = version.split('.').map(int.parse).toList();
 
-    if (decodedResponse.major > versionList[0]) {
+    if (decodedResponse["major"] > versionList[0]) {
       return true;
-    } else if (decodedResponse.major == versionList[0]) {
-      if (decodedResponse.minor > versionList[1]) {
+    } else if (decodedResponse["major"] == versionList[0]) {
+      if (decodedResponse["minor"] > versionList[1]) {
         return true;
-      } else if (decodedResponse.minor == versionList[1]) {
-        if (decodedResponse.patch > versionList[2]) {
+      } else if (decodedResponse["minor"] == versionList[1]) {
+        if (decodedResponse["patch"] > versionList[2]) {
           return true;
         }
       }
@@ -91,7 +41,7 @@ Future<void> installBuildInTempPath() async {
   final response = await http.get(url);
   if (response.statusCode == 200) {
     var tempDir = await getTemporaryDirectory();
-    var file = File('${tempDir.path}/autoupdate.msix');
+    var file = File('${tempDir.path}\\autoupdate.msix');
     await file.writeAsBytes(response.bodyBytes);
     log('File downloaded to: ${file.path}');
   } else {
@@ -99,13 +49,32 @@ Future<void> installBuildInTempPath() async {
   }
 }
 
+Future<void> executeNewBuildInstaller() async {
+  // execute the new build installer
+  // using the command line
+  var tempDir = await getTemporaryDirectory();
+  var file = File('${tempDir.path}\\autoupdate.msix');
+  if (file.existsSync()) {
+    var shell = Shell();
+    try {
+      await shell.run('powershell.exe ${file.path}');
+      log('Installer executed');
+    } catch (e) {
+      log('Error executing installer: $e');
+    } finally {
+      log('Installer executed');
+      shell.kill();
+    }
+  }
+}
+
 void main() async {
-  if (await newBuildExist()) {
-    await installBuildInTempPath();
-  }
-  if (!autoUpdateTaskExist()) {
-    installAutoUpdateTask();
-  }
+  Future.delayed(const Duration(minutes: 1), () async {
+    if (await newBuildExist()) {
+      await installBuildInTempPath();
+      await executeNewBuildInstaller();
+    }
+  });
   runApp(const MyApp());
 }
 

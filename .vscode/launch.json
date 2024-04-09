@@ -5,9 +5,11 @@
     "version": "0.2.0",
     "configurations": [
         {
+
             "name": "autoupdate",
             "request": "launch",
             "type": "dart",
+            "dart.sdkPath": ".fvm/flutter_sdk",
             "args": [
                 "-d",
                 "windows"
