@@ -6,10 +6,10 @@ Edit pubspec.yaml to set the right version
 
 ```yaml
     msix_config:
-  display_name: Flutter App
-  publisher_display_name: Company Name
-  identity_name: company.suite.flutterapp
-  msix_version: 1.0.0.0
+        display_name: Flutter App
+        publisher_display_name: Company Name
+        identity_name: company.suite.flutterapp
+        msix_version: 1.0.0.0
 ```
 
 Create a new package
@@ -22,9 +22,9 @@ Set the package version in the server, the server should return a json with the 
 
 ```json
     {
-    "major":2,
-    "minor":0,
-    "patch":0
+        "major":2,
+        "minor":0,
+        "patch":0
     }
 ```
 
